@@ -3,6 +3,8 @@ import { constants } from 'http2'
 import BadRequestError from '../errors/bad-request-error'
 import { types } from '../middlewares/file'
 import mime from 'mime'
+import fs from 'fs'
+import sharp from 'sharp'
 
 export const uploadFile = async (
     req: Request,
@@ -19,6 +21,13 @@ export const uploadFile = async (
     }
 
     if (!types.includes(fileType)) {
+        return next(new BadRequestError('Неверный формат файла'))
+    }
+
+    const file = fs.readFileSync(req.file.path);
+    const metadata = await sharp(file).metadata();
+    
+    if (!metadata.width || !metadata.height) {
         return next(new BadRequestError('Неверный формат файла'))
     }
 
