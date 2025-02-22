@@ -3,6 +3,7 @@ import { FilterQuery } from 'mongoose'
 import NotFoundError from '../errors/not-found-error'
 import Order from '../models/order'
 import User, { IUser } from '../models/user'
+import BadRequestError from '../errors/bad-request-error'
 
 // TODO: Добавить guard admin
 // eslint-disable-next-line max-len
@@ -13,6 +14,17 @@ export const getCustomers = async (
     next: NextFunction
 ) => {
     try {
+
+        for (const item in req.query) {
+            if (typeof req.query[item] === 'object') {
+                throw new BadRequestError('Недопустимый тип параметра запроса');
+            }
+        }
+
+        if (Number(req.query.limit) > 10) {
+            req.query.limit = '10';
+        }
+
         const {
             page = 1,
             limit = 10,
