@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { constants } from 'http2'
 import BadRequestError from '../errors/bad-request-error'
 import { types } from '../middlewares/file'
+import mime from 'mime'
 
 export const uploadFile = async (
     req: Request,
@@ -11,8 +12,13 @@ export const uploadFile = async (
     if (!req.file) {
         return next(new BadRequestError('Файл не загружен'))
     }
+    const fileType = mime.lookup(req.file.path);
+    
+    if (!fileType) {
+        return next(new BadRequestError('Тип файла не определен'))
+    }
 
-    if (!types.includes(req.file.mimetype)) {
+    if (!types.includes(fileType)) {
         return next(new BadRequestError('Неверный формат файла'))
     }
 
