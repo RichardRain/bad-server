@@ -20,7 +20,7 @@ export const uploadFile = async (
         return next(new BadRequestError('Файл слишком маленький'))
     }
 
-    if (req.file.size > 1048576) {
+    if (req.file.size > 10485760) {
         return next(new BadRequestError('Файл слишком большой'))
     }
 
