@@ -15,6 +15,11 @@ export const getOrders = async (
     next: NextFunction
 ) => {
     try {
+
+        if (Number(req.query.limit) > 10) {
+            req.query.limit = '10';
+        }
+
         const {
             page = 1,
             limit = 10,
