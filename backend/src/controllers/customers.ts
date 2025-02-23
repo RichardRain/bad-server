@@ -14,15 +14,14 @@ export const getCustomers = async (
     next: NextFunction
 ) => {
     try {
-
         for (const item in req.query) {
             if (typeof req.query[item] === 'object') {
-                throw new BadRequestError('Недопустимый тип параметра запроса');
+                throw new BadRequestError('Недопустимый тип параметра запроса')
             }
         }
 
         if (Number(req.query.limit) > 10) {
-            req.query.limit = '10';
+            req.query.limit = '10'
         }
 
         const {

@@ -13,22 +13,25 @@ import rateLimit from 'express-rate-limit'
 
 const app = express()
 
-app.use(rateLimit({
-    windowMs: 60 * 1000,
-    limit: 50,
-    message: 'Слишком много запросов с вашего IP, пожалуйста попробуйте позже'
-}))
+app.use(
+    rateLimit({
+        windowMs: 60 * 1000,
+        limit: 50,
+        message:
+            'Слишком много запросов с вашего IP, пожалуйста попробуйте позже',
+    })
+)
 
 app.use(cookieParser())
 
-app.use(cors(corsOptions));
+app.use(cors(corsOptions))
 
 app.use(serveStatic(path.join(__dirname, 'public')))
 
 app.use(urlencoded({ extended: true }))
 app.use(json())
 
-app.options('*', cors(corsOptions));
+app.options('*', cors(corsOptions))
 app.use(routes)
 app.use(errors())
 app.use(errorHandler)

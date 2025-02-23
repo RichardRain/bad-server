@@ -12,10 +12,10 @@ const tempDirectory = join(
     process.env.UPLOAD_PATH_TEMP
         ? `../public/${process.env.UPLOAD_PATH_TEMP}`
         : '../public'
-);
+)
 
 if (!fs.existsSync(tempDirectory)) {
-    fs.mkdirSync(tempDirectory);
+    fs.mkdirSync(tempDirectory)
 }
 
 const storage = multer.diskStorage({
@@ -24,10 +24,7 @@ const storage = multer.diskStorage({
         _file: Express.Multer.File,
         cb: DestinationCallback
     ) => {
-        cb(
-            null,
-            tempDirectory
-        )
+        cb(null, tempDirectory)
     },
 
     filename: (
@@ -59,4 +56,4 @@ const fileFilter = (
     return cb(null, true)
 }
 
-export default multer({ storage, fileFilter, limits: { fileSize: 10485760} })
+export default multer({ storage, fileFilter, limits: { fileSize: 10485760 } })

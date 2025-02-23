@@ -84,7 +84,7 @@ const userSchema = new mongoose.Schema<IUser, IUserModel, IUserMethods>(
             validate: {
                 validator: (v: string) => validator.isMobilePhone(v),
                 message: 'Поле "phone" должно быть валидным номером телефона',
-            }
+            },
         },
         lastOrderDate: {
             type: Date,

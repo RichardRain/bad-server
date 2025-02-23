@@ -27,5 +27,10 @@ export const REFRESH_TOKEN = {
 export const corsOptions = {
     origin: ORIGIN_ALLOW,
     credentials: true,
-    allowedHeaders: ["Access-Control-Allow-Origin", "Origin", "Content-Type", "Authorization"]
+    allowedHeaders: [
+        'Access-Control-Allow-Origin',
+        'Origin',
+        'Content-Type',
+        'Authorization',
+    ],
 }

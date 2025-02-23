@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express'
 import { constants } from 'http2'
-import BadRequestError from '../errors/bad-request-error'
-import { types } from '../middlewares/file'
+import { loadEsm } from 'load-esm'
 import fs from 'fs/promises'
 import sharp from 'sharp'
-import { loadEsm } from 'load-esm'
+import BadRequestError from '../errors/bad-request-error'
+import { types } from '../middlewares/file'
 
 export const uploadFile = async (
     req: Request,
@@ -19,7 +19,8 @@ export const uploadFile = async (
     let file: Buffer
 
     try {
-        const { fileTypeFromBuffer } = await loadEsm<typeof import('file-type')>('file-type')
+        const { fileTypeFromBuffer } =
+            await loadEsm<typeof import('file-type')>('file-type')
 
         file = await fs.readFile(filePath)
 
