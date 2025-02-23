@@ -15,9 +15,7 @@ const app = express()
 
 app.use(rateLimit({
     windowMs: 60 * 1000,
-    limit: 30,
-    standardHeaders: true,
-    legacyHeaders: false,
+    limit: 50,
     message: 'Слишком много запросов с вашего IP, пожалуйста попробуйте позже'
 }))
 
