@@ -5,7 +5,7 @@ import 'dotenv/config'
 import express, { json, urlencoded } from 'express'
 import mongoose from 'mongoose'
 import path from 'path'
-import { DB_ADDRESS, PORT, ORIGIN_ALLOW } from './config'
+import { DB_ADDRESS, PORT, corsOptions } from './config'
 import errorHandler from './middlewares/error-handler'
 import serveStatic from './middlewares/serverStatic'
 import routes from './routes'
@@ -23,14 +23,14 @@ app.use(rateLimit({
 
 app.use(cookieParser())
 
-app.use(cors({ origin: ORIGIN_ALLOW, credentials: true }));
+app.use(cors(corsOptions));
 
 app.use(serveStatic(path.join(__dirname, 'public')))
 
 app.use(urlencoded({ extended: true }))
 app.use(json())
 
-app.options('*', cors())
+app.options('*', cors(corsOptions));
 app.use(routes)
 app.use(errors())
 app.use(errorHandler)

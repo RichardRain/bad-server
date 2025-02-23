@@ -23,3 +23,9 @@ export const REFRESH_TOKEN = {
         } as CookieOptions,
     },
 }
+
+export const corsOptions = {
+    origin: ORIGIN_ALLOW,
+    credentials: true,
+    allowedHeaders: ["Access-Control-Allow-Origin", "Origin", "Content-Type", "Authorization"]
+}
