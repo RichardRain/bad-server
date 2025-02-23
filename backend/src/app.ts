@@ -9,9 +9,18 @@ import { DB_ADDRESS } from './config'
 import errorHandler from './middlewares/error-handler'
 import serveStatic from './middlewares/serverStatic'
 import routes from './routes'
+import rateLimit from 'express-rate-limit'
 
 const { PORT = 3000 } = process.env
 const app = express()
+
+app.use(rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 30,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: 'Слишком много запросов с вашего IP, пожалуйста попробуйте позже'
+}))
 
 app.use(cookieParser())
 
