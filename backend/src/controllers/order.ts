@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { FilterQuery, Error as MongooseError, Types } from 'mongoose'
+import validator from 'validator'
 import BadRequestError from '../errors/bad-request-error'
 import NotFoundError from '../errors/not-found-error'
 import Order, { IOrder } from '../models/order'
@@ -15,6 +16,16 @@ export const getOrders = async (
     next: NextFunction
 ) => {
     try {
+        for (const item in req.query) {
+            if (typeof req.query[item] === 'object') {
+                throw new BadRequestError('Недопустимый тип параметра запроса')
+            }
+        }
+
+        if (Number(req.query.limit) > 10) {
+            req.query.limit = '10'
+        }
+
         const {
             page = 1,
             limit = 10,
@@ -294,6 +305,10 @@ export const createOrder = async (
         const { address, payment, phone, total, email, items, comment } =
             req.body
 
+        if (phone && !validator.isMobilePhone(phone)) {
+            throw new BadRequestError('Неверный формат номера телефона')
+        }
+
         items.forEach((id: Types.ObjectId) => {
             const product = products.find((p) => p._id.equals(id))
             if (!product) {
@@ -315,7 +330,7 @@ export const createOrder = async (
             payment,
             phone,
             email,
-            comment,
+            comment: validator.escape(comment),
             customer: userId,
             deliveryAddress: address,
         })

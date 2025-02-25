@@ -3,7 +3,7 @@ import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
 import mongoose, { Document, HydratedDocument, Model, Types } from 'mongoose'
 import validator from 'validator'
-import md5 from 'md5'
+import bycrypt from 'bcryptjs'
 
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '../config'
 import UnauthorizedError from '../errors/unauthorized-error'
@@ -14,6 +14,7 @@ export enum Role {
 }
 
 export interface IUser extends Document {
+    _id: Types.ObjectId
     name: string
     email: string
     password: string
@@ -80,6 +81,10 @@ const userSchema = new mongoose.Schema<IUser, IUserModel, IUserMethods>(
         },
         phone: {
             type: String,
+            validate: {
+                validator: (v: string) => validator.isMobilePhone(v),
+                message: 'Поле "phone" должно быть валидным номером телефона',
+            },
         },
         lastOrderDate: {
             type: Date,
@@ -120,7 +125,7 @@ const userSchema = new mongoose.Schema<IUser, IUserModel, IUserMethods>(
 userSchema.pre('save', async function hashingPassword(next) {
     try {
         if (this.isModified('password')) {
-            this.password = md5(this.password)
+            this.password = await bycrypt.hash(this.password, 10)
         }
         next()
     } catch (error) {
@@ -131,7 +136,7 @@ userSchema.pre('save', async function hashingPassword(next) {
 // Можно лучше: централизованное создание accessToken и  refresh токена
 
 userSchema.methods.generateAccessToken = function generateAccessToken() {
-    const user = this
+    const user = this as IUser
     // Создание accessToken токена возможно в контроллере авторизации
     return jwt.sign(
         {
@@ -148,7 +153,7 @@ userSchema.methods.generateAccessToken = function generateAccessToken() {
 
 userSchema.methods.generateRefreshToken =
     async function generateRefreshToken() {
-        const user = this
+        const user = this as IUser
         // Создание refresh токена возможно в контроллере авторизации/регистрации
         const refreshToken = jwt.sign(
             {
@@ -181,7 +186,7 @@ userSchema.statics.findUserByCredentials = async function findByCredentials(
     const user = await this.findOne({ email })
         .select('+password')
         .orFail(() => new UnauthorizedError('Неправильные почта или пароль'))
-    const passwdMatch = md5(password) === user.password
+    const passwdMatch = await bycrypt.compare(password, user.password)
     if (!passwdMatch) {
         return Promise.reject(
             new UnauthorizedError('Неправильные почта или пароль')
@@ -191,7 +196,7 @@ userSchema.statics.findUserByCredentials = async function findByCredentials(
 }
 
 userSchema.methods.calculateOrderStats = async function calculateOrderStats() {
-    const user = this
+    const user = this as IUser
     const orderStats = await mongoose.model('order').aggregate([
         { $match: { customer: user._id } },
         {
